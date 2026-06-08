@@ -22,7 +22,7 @@ type FormData = Omit<ExpungementCase, "id" | "createdAt">;
 
 const empty: FormData = {
   caseNumber: "", courtType: "District", county: "", defendantName: "", defendantDOB: "",
-  defendantAddress: "", defendantCity: "", defendantState: "MD", defendantZip: "",
+  defendantAddress: "", defendantCity: "", defendantState: "", defendantZip: "",
   defendantPhone: "", defendantEmail: "", dispositionType: "", dispositionDate: "",
   offenseDescription: "", lawEnforcementAgency: "", incidentLocation: "", incidentDescription: "",
   arrestType: "arrested", hasPendingCases: "no", sentenceCompleted: "", sentenceCompletionDate: "",
@@ -117,7 +117,7 @@ export default function CaseForm() {
         // mailing address manually before generating the petition.
         updates.defendantAddress = "";
         updates.defendantCity = "";
-        updates.defendantState = "MD";
+        updates.defendantState = "";
         updates.defendantZip = "";
       }
       if (data.caseInfo) {
@@ -328,7 +328,7 @@ export default function CaseForm() {
                 <div className="space-y-2 md:col-span-2"><Label>Address <span className="text-red-500 text-xs font-normal">(current — required for petition)</span></Label><Input placeholder="Client's current street address" value={form.defendantAddress || ""} onChange={(e) => set("defendantAddress", e.target.value)} /></div>
                 <div className="space-y-2"><Label>City</Label><Input value={form.defendantCity || ""} onChange={(e) => set("defendantCity", e.target.value)} /></div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label>State</Label><Input value={form.defendantState || "MD"} onChange={(e) => set("defendantState", e.target.value)} /></div>
+                  <div className="space-y-2"><Label>State</Label><Input value={form.defendantState || ""} onChange={(e) => set("defendantState", e.target.value)} /></div>
                   <div className="space-y-2"><Label>Zip</Label><Input value={form.defendantZip || ""} onChange={(e) => set("defendantZip", e.target.value)} /></div>
                 </div>
                 <div className="space-y-2"><Label>Phone</Label><Input value={form.defendantPhone || ""} onChange={(e) => set("defendantPhone", e.target.value)} /></div>
@@ -985,7 +985,7 @@ function PetitionView({ caseData, eligResult, caseId }: { caseData: FormData; el
             <p>Date: ________________</p>
             <p>Printed Name: {caseData.defendantName || "________________"}</p>
             <p>Address: {caseData.defendantAddress || "________________"}</p>
-            <p>{caseData.defendantCity || "________________"}, {caseData.defendantState || "MD"} {caseData.defendantZip || "________________"}</p>
+            <p>{caseData.defendantCity || "________________"}, {caseData.defendantState || "________________"} {caseData.defendantZip || "________________"}</p>
             <p>Telephone: {caseData.defendantPhone || "________________"}</p>
             <p>Email: {caseData.defendantEmail || "________________"}</p>
           </div>
