@@ -1267,19 +1267,23 @@ export const ELIGIBLE_OFFENSES: Map<string, OffenseInfo> = new Map([
   // TRANSPORTATION ARTICLE
   // =========================================================================
 
-  // § 16-303 — Driving without license [NEW 2025] (was formerly § 16-101)
+  // § 16-303 — Driving while license suspended or revoked.
+  // Eligible since the Justice Reinvestment Act (2016 SB 1005), effective
+  // October 1, 2017 — CP § 10-110(a)(1)(xxvii). NOT a 2025 Reform Act addition.
   ["tr§16-303", {
     statute: "TR § 16-303",
-    description: "Driving without a license (§ 16-303)",
+    description: "Driving while license suspended or revoked (§ 16-303)",
     waitYears: 5,
     tier: "misdemeanor",
     domestic: false,
-    new2025: true,
+    new2025: false,
   }],
-  // Old statute reference kept for backward compat
+  // § 16-101 — Driving without a license (license required).
+  // Added to the eligible list by the 2025 Reform Act. Distinct from § 16-303;
+  // do not conflate the two.
   ["tr§16-101", {
     statute: "TR § 16-101",
-    description: "Driving without a license (§ 16-101, now § 16-303)",
+    description: "Driving without a license (§ 16-101)",
     waitYears: 5,
     tier: "misdemeanor",
     domestic: false,
@@ -1583,8 +1587,12 @@ const DESCRIPTION_KEYWORD_MAP: Array<[RegExp, string]> = [
   [/(unauthoriz|unauth).{0,20}(motor|vehicle)/i,   "cl§6-503"],
   // Prostitution
   [/prostitut/i,                                   "cl§11-306"],
-  // Driving without license
-  [/driv.{0,20}(without|no).{0,10}licen/i,        "tr§16-303"],
+  // Driving while license suspended or revoked — TR § 16-303 (eligible since JRA 2017)
+  // Matches MD Case Search labels like "DRIVING MOTOR VEH WHILE LIC SUSPENDED UNDER (17-106, 26-204 ETC)"
+  // and the shorter "DRIVING WHILE SUSPENDED", "DRIVING ON SUSPENDED LICENSE", etc.
+  [/(driv|operat).{0,40}(suspend|revok)/i,        "tr§16-303"],
+  // Driving without a license — TR § 16-101 (added by 2025 Reform Act)
+  [/driv.{0,20}(without|no|w\/o).{0,15}licen/i,   "tr§16-101"],
   // Failure to comply with protective order
   [/(fail|violat).{0,20}(protective|protect).{0,10}order/i, "fl§4-509"],
   // Bad check
