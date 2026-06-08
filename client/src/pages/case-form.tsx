@@ -71,6 +71,8 @@ export default function CaseForm() {
   const [autoExpungeInfo, setAutoExpungeInfo] = useState<{ autoExpunged: boolean; message: string } | null>(null);
   // New state for "new conviction during waiting period" question
   const [newConvictionDuringWait, setNewConvictionDuringWait] = useState<"no" | "yes" | "unknown">("no");
+  // Case number(s) of the subsequent conviction(s) — drives the cross-case § 10-110(d)(1) analyzer
+  const [subsequentCaseNumbers, setSubsequentCaseNumbers] = useState<string>("");
   // Hidden state for statute code populated from Case Search
   const [statuteCode, setStatuteCode] = useState<string>("");
 
@@ -450,9 +452,53 @@ export default function CaseForm() {
                   <div className="flex items-center space-x-1"><RadioGroupItem value="unknown" id="nc-u" /><Label htmlFor="nc-u" className="text-sm">Unknown</Label></div>
                 </RadioGroup>
                 {newConvictionDuringWait === "yes" && (
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800 mt-2" data-testid="new-conviction-warning">
-                    <AlertTriangle className="w-4 h-4 inline-block mr-1 mb-0.5" />
-                    A new conviction during the waiting period may block expungement unless the new conviction itself becomes eligible (CP § 10-110(d)(1)).
+                  <div className="space-y-3 mt-2" data-testid="new-conviction-followup">
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
+                      <AlertTriangle className="w-4 h-4 inline-block mr-1 mb-0.5" />
+                      A new conviction during the waiting period may block expungement unless the new conviction itself becomes eligible (CP § 10-110(d)(1)). To determine whether the block is permanent or recoverable, the tool needs to analyze the new case alongside this one.
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="subsequent-cases">Case number(s) of the new conviction(s)</Label>
+                      <Textarea
+                        id="subsequent-cases"
+                        value={subsequentCaseNumbers}
+                        onChange={(e) => setSubsequentCaseNumbers(e.target.value)}
+                        placeholder={"One per line, e.g.\n1B02123456\nD-01-CR-22-001234"}
+                        className="min-h-[80px] font-mono text-sm"
+                        data-testid="textarea-subsequent-cases"
+                      />
+                      <Button
+                        onClick={() => {
+                          const subs = subsequentCaseNumbers
+                            .split("\n")
+                            .map((s) => s.trim())
+                            .filter((s) => s.length > 0);
+                          const all = [form.caseNumber, ...subs].filter((s) => s && s.length > 0);
+                          if (all.length < 2) return;
+                          navigate(`/record-analysis?cases=${encodeURIComponent(all.join(","))}`);
+                        }}
+                        disabled={!form.caseNumber || subsequentCaseNumbers.trim().length === 0}
+                        className="bg-[#01696F] hover:bg-[#015258]"
+                        data-testid="button-run-cross-case"
+                      >
+                        <Search className="w-4 h-4 mr-2" /> Run § 10-110(d)(1) Cross-Case Analysis
+                      </Button>
+                    </div>
+
+                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs text-slate-700">
+                      <p className="font-semibold mb-1">Don't have the case number?</p>
+                      <p className="mb-2">
+                        Look it up on <a className="text-[#01696F] underline" href="https://casesearch.courts.state.md.us/casesearch/" target="_blank" rel="noopener noreferrer">Maryland Case Search</a> using the defendant's name + DOB.
+                      </p>
+                      <p className="mb-1">If the new case is out-of-state or otherwise not in MD Case Search, the tool can't run the blocking analysis automatically. To do it by hand, collect:</p>
+                      <ul className="list-disc list-inside space-y-0.5 ml-1">
+                        <li>Disposition date of the new conviction (compare against this case's waiting-period window)</li>
+                        <li>Statute / offense (to check eligibility under CP § 10-110(a))</li>
+                        <li>Sentence completion date (starts the new case's own waiting period)</li>
+                        <li>Whether probation has been discharged</li>
+                      </ul>
+                    </div>
                   </div>
                 )}
               </div>

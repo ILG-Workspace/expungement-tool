@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -100,6 +100,17 @@ export default function RecordAnalysis() {
   const [result, setResult] = useState<RecordAnalysisResult | null>(null);
   const [error, setError] = useState("");
   const [expandedCases, setExpandedCases] = useState<Set<string>>(new Set());
+
+  // Pre-fill case numbers from the URL (?cases=A,B,C) — used when the case-form
+  // routes a "subsequent conviction = yes" defendant here.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("cases");
+    if (raw) {
+      const nums = raw.split(",").map((s) => s.trim()).filter((s) => s.length > 0);
+      if (nums.length > 0) setCaseNumbers(nums.join("\n"));
+    }
+  }, []);
 
   // Toggle expanded state for a case card
   function toggleCase(caseNumber: string) {
